@@ -8,12 +8,12 @@ public class Account {
     private String email;
     private String userName;
     private String fullName;
-    private String departmentId;
-    private String positionId;
+    private Integer departmentId;
+    private Integer positionId;
     private LocalDate createDate;
     private String gender;
 
-    public Account(String gender, LocalDate createDate, String departmentId, String email, String fullName, String userName, int accountId, String positionId) {
+    public Account(String gender, LocalDate createDate, Integer departmentId, String email, String fullName, String userName, int accountId, Integer positionId) {
         this.gender = gender;
         this.createDate = createDate;
         this.departmentId = departmentId;
@@ -62,19 +62,19 @@ public class Account {
         this.fullName = fullName;
     }
 
-    public String getDepartmentId() {
+    public Integer getDepartmentId() {
         return departmentId;
     }
 
-    public void setDepartmentId(String departmentId) {
+    public void setDepartmentId(Integer departmentId) {
         this.departmentId = departmentId;
     }
 
-    public String getPositionId() {
+    public Integer getPositionId() {
         return positionId;
     }
 
-    public void setPositionId(String positionId) {
+    public void setPositionId(Integer positionId) {
         this.positionId = positionId;
     }
 
