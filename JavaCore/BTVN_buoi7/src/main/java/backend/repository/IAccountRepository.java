@@ -1,11 +1,11 @@
-package backend.service;
+package backend.repository;
 
 import entity.Account;
 
 import java.util.List;
 
-public interface IQLNSService {
-    List<Account> getAccountS();
+public interface IAccountRepository {
+    List<Account> getAccounts();
 
     boolean kiemTraTonTaiAccountId(Integer accountId);
 
@@ -13,9 +13,13 @@ public interface IQLNSService {
 
     boolean xoaAccountTheoId(Integer accountId);
 
-    boolean kiemTraTonTaiDepartmentId(Integer departmentId);
 
-    boolean kiemTraTonTaiPostionId(Integer positionId);
 
     boolean themAccount(String email, String userName, String fullName, Integer departmentId, Integer positionId, String gender);
+
+    boolean checkTonTaiEmail(String email);
+
+    boolean checkTonTaiUserNameThem(String userName);
+
+    boolean checkTonTaiUserNameSua(Integer accountId, String userName);
 }

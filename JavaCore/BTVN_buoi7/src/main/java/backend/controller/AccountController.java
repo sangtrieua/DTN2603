@@ -1,15 +1,16 @@
 package backend.controller;
 
-import backend.service.impl.QLNSServiceImpl;
+import backend.service.IAccountService;
+import backend.service.impl.AccountServiceImpl;
 import entity.Account;
 
 import java.util.List;
 
-public class QLNSController {
-    private QLNSServiceImpl service;
+public class AccountController {
+    private IAccountService service;
 
-    public QLNSController() {
-        service = new QLNSServiceImpl();
+    public AccountController() {
+        service = new AccountServiceImpl();
     }
 
 
@@ -33,16 +34,23 @@ public class QLNSController {
     }
 
 
-    public boolean kiemTraTonTaiDepartmentId(Integer departmentId) {
-        return service.kiemTraTonTaiDepartmentId(departmentId);
-    }
 
 
-    public boolean kiemTraTonTaiPostionId(Integer positionId) {
-        return service.kiemTraTonTaiPostionId(positionId);
-    }
+
 
     public boolean themAccount(String email, String userName, String fullName, Integer departmentId, Integer positionId, String gender) {
         return service.themAccount(email,userName,fullName,departmentId,positionId,gender);
+    }
+
+    public boolean checkTonTaiEmail(String email) {
+        return service.checkTonTaiEmail(email);
+    }
+
+    public boolean checkTonTaiUserNameThem(String userName) {
+        return service.checkTonTaiUserNameThem(userName);
+    }
+
+    public boolean checkTonTaiUserNameSua(Integer accountId, String userName) {
+        return service.checkTonTaiUserNameSua(accountId,userName);
     }
 }
