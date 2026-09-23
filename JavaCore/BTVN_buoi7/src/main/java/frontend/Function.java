@@ -3,6 +3,7 @@ package frontend;
 import backend.controller.AccountController;
 import backend.controller.DepartmentController;
 import backend.controller.PostionController;
+import common.StringCommon;
 import entity.Account;
 import entity.Department;
 import entity.Postion;
@@ -46,7 +47,7 @@ public class Function {
             email=sc.nextLine();
             if(!this.checkLength(email,6,100))
                 continue;
-            if(!email.trim().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+            if(!email.trim().matches(StringCommon.EMAIL_REGEX)) {
                 System.err.println("Nhập sai định dạng mail");
                 continue;
             }
@@ -119,7 +120,9 @@ public class Function {
             default: gender="chưa xác định";
 
         }
-        if(accountController.themAccount(email,userName,fullName,departmentId,positionId,gender))
+
+        Account account=new Account(email,userName,fullName,departmentId,positionId,gender);
+        if(accountController.themAccount(account))
             System.out.println("thêm Thành công");
         else
             System.err.println("thêm Thất bại");
@@ -232,7 +235,8 @@ public class Function {
             System.out.println("2.sửa username theo accountId");
             System.out.println("3.xóa account theo accountId");
             System.out.println("4.hiển thị ds account");
-            System.out.println("5.trở về menu chính");
+            System.out.println("5.Import account từ file .csv");
+            System.out.println("6.trở về menu chính");
             String chonPhu = sc.nextLine();
             switch (chonPhu) {
                 case "1":
@@ -248,9 +252,27 @@ public class Function {
                     this.hienthi();
                     continue;
                 case "5":
+                    this.importCSV();
+                    continue;
+                case "6":
                     System.exit(0);
                 default:System.err.println("Nhập sai nhập lại"); continue;
             }
         }
+    }
+
+    private void importCSV() {
+        String url;
+        while (true) {
+        System.out.println("Nhập đường dẫn file csv muốn  import:");//D:\FITHOU_23\VTI Academy\java_core\csv\input_account.csv
+        url=sc.nextLine();
+            if (!url.endsWith(".csv")) {
+                System.out.println( "File không đúng định dạng!!");
+                continue;
+            }
+            break;
+        }
+        String message=accountController.importCSV(url);
+        System.out.println(message);
     }
 }

@@ -38,8 +38,8 @@ public class AccountController {
 
 
 
-    public boolean themAccount(String email, String userName, String fullName, Integer departmentId, Integer positionId, String gender) {
-        return service.themAccount(email,userName,fullName,departmentId,positionId,gender);
+    public boolean themAccount(Account account) {
+        return service.themAccount(account);
     }
 
     public boolean checkTonTaiEmail(String email) {
@@ -52,5 +52,9 @@ public class AccountController {
 
     public boolean checkTonTaiUserNameSua(Integer accountId, String userName) {
         return service.checkTonTaiUserNameSua(accountId,userName);
+    }
+
+    public String importCSV(String url) {
+        return service.importCSV(url);
     }
 }

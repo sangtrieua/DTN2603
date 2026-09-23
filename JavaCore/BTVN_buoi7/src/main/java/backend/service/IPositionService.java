@@ -9,4 +9,5 @@ public interface IPositionService {
     Postion getPostionById(int positionId);
 
     List<Postion> getPostions();
+
 }

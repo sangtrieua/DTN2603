@@ -106,7 +106,7 @@ public class AccountRepositoryImpl implements IAccountRepository {
 
 
     @Override
-    public boolean themAccount(String email, String userName, String fullName, Integer departmentId, Integer positionId, String gender) {
+    public boolean themAccount(Account account) {
         String sql="INSERT INTO account\n" +
                 "    (email, username, fullname, department_id, position_id,gender)\n" +
                 "VALUES\n" +
@@ -115,12 +115,12 @@ public class AccountRepositoryImpl implements IAccountRepository {
         try {
             con= JDBCUtils.getConnection();
             PreparedStatement st=con.prepareStatement(sql);
-            st.setString(1, email);
-            st.setString(2, userName);
-            st.setString(3, fullName);
-            st.setInt(4, departmentId);
-            st.setInt(5, positionId);
-            st.setString(6, gender);
+            st.setString(1, account.getEmail());
+            st.setString(2, account.getUserName());
+            st.setString(3, account.getFullName());
+            st.setInt(4, account.getDepartment().getDepartmentId());
+            st.setInt(5, account.getPostion().getPostionId());
+            st.setString(6, account.getGender());
             int i=st.executeUpdate();
             return i > 0;
 
@@ -173,6 +173,34 @@ public class AccountRepositoryImpl implements IAccountRepository {
             st.setInt(2, accountId);
             ResultSet rs=st.executeQuery();
             return rs.next();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        finally {JDBCUtils.close(con);}
+    }
+
+    @Override
+    public boolean themListAccount(List<Account> accounts) {
+        String sql="INSERT INTO account\n" +
+                "    (email, username, fullname, department_id, position_id,gender)\n" +
+                "VALUES\n" ;
+        for(Account account:accounts){
+            sql += "('" + account.getEmail() + "'," +
+                    "'" + account.getUserName() + "'," +
+                    "'" + account.getFullName() + "'," +
+                    account.getDepartment().getDepartmentId() + "," +
+                    account.getPostion().getPostionId() + "," +
+                    "'" + account.getGender() + "'),";
+        }
+
+        sql = sql.substring(0, sql.length() - 1);
+        Connection con=null;
+        try {
+            con= JDBCUtils.getConnection();
+            Statement st=con.createStatement();
+                        int i=st.executeUpdate(sql);
+            return i > 0;
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

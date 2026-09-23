@@ -15,11 +15,13 @@ public interface IAccountRepository {
 
 
 
-    boolean themAccount(String email, String userName, String fullName, Integer departmentId, Integer positionId, String gender);
+    boolean themAccount(Account account);
 
     boolean checkTonTaiEmail(String email);
 
     boolean checkTonTaiUserNameThem(String userName);
 
     boolean checkTonTaiUserNameSua(Integer accountId, String userName);
+
+    boolean themListAccount(List<Account> accounts);
 }
