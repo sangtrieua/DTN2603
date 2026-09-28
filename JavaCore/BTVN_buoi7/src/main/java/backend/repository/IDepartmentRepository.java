@@ -10,5 +10,6 @@ public interface IDepartmentRepository {
     Department getDepartmentById(int departmentId);
 
     List<Department> getDepartments();
+    void themListDepartment(List<Department> departments);
 
 }

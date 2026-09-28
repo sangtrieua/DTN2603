@@ -41,6 +41,15 @@ public class Account {
         this.gender = gender;
     }
 
+    public Account(String email, String userName, String fullName, Department department, Postion postion, String gender) {
+        this.email = email;
+        this.userName = userName;
+        this.fullName = fullName;
+        this.department = department;
+        this.postion = postion;
+        this.gender = gender;
+    }
+
     public Account() {
     }
 

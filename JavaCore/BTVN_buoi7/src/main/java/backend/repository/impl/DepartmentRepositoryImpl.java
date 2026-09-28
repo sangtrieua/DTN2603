@@ -78,4 +78,23 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 
         return departments;
     }
+
+    @Override
+    public void themListDepartment(List<Department> departments) {
+        Connection con=null;
+        try {
+            con= JDBCUtils.getConnection();
+            String sql="INSERT INTO department(department_name)" +
+                    "VALUES (?);";
+            PreparedStatement st=con.prepareStatement(sql);
+            for (Department department : departments) {
+                st.setString(1, department.getDepartmentName());
+                st.addBatch();
+            }
+            st.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        finally {JDBCUtils.close(con);}
+    }
 }

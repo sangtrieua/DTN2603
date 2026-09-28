@@ -9,4 +9,7 @@ public interface IDepartmentService {
     Department getDepartmentById(int departmentId);
 
     List<Department> getDepartments();
+
+    String importDepartmentCSV(String url);
+
 }

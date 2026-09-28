@@ -7,17 +7,19 @@ import backend.repository.impl.AccountRepositoryImpl;
 import backend.repository.impl.DepartmentRepositoryImpl;
 import backend.repository.impl.PositionRepositoryImpl;
 import backend.service.IAccountService;
+import backend.service.ImportFileCSV;
 import common.StringCommon;
+import context.AccountContext;
 import entity.Account;
+import entity.Department;
+import entity.Postion;
 
 import java.io.*;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class AccountServiceImpl implements IAccountService {
+public class AccountServiceImpl implements IAccountService, ImportFileCSV<Account, AccountContext> {
     IAccountRepository accountRepository;
     IDepartmentRepository departmentRepository;
     IPositionRepository positionRepository;
@@ -72,58 +74,28 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public String importCSV(String url) {
 
-        File file = new File(url);
-        if (!file.exists()) {
-            return "File không tồn tại!!";
-        }
-        List<Account> accounts=new ArrayList<>();
+        List<Account> accounts=accountRepository.getAccounts();
+        List<Department> departments=departmentRepository.getDepartments();
+        List<Postion> postions=positionRepository.getPostions();
+        Set<String> setUserName=accounts.stream().map(Account::getUserName).collect(Collectors.toSet());
+        Set<String> setEmail=accounts.stream().map(Account::getEmail).collect(Collectors.toSet());
+        Map<Integer,Department> mapByDepartmentId=departments.stream().collect(Collectors.toMap(department->
+                department.getDepartmentId(),department->department));
+        Map<Integer,Postion> mapByPostionId=postions.stream().collect(Collectors.toMap(postion->
+                postion.getPostionId(),postion->postion));
 
-        List<String> listErrors=new ArrayList<>();
-        String header="";
-        try(BufferedReader br = new BufferedReader(new FileReader(url))) {
-            String line;
-            header=br.readLine();
-            while ((line = br.readLine()) != null) {
-                String message =this.validationAccount(line,accounts);
-                if(Objects.nonNull(message)){
-                    listErrors.add(message);
-                }
-
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
-//        for (Account account : accounts) {
-//            accountRepository.themAccount(account);
-//
-//        }
-        boolean b=accountRepository.themListAccount(accounts);
-
-        if(!listErrors.isEmpty()){
-            try {
-
-
-            BufferedWriter bw = new BufferedWriter(new FileWriter("D:\\FITHOU_23\\VTI Academy\\java_core\\csv\\input_account_error.csv"));
-            bw.write(header+", error_message");
-            bw.newLine();
-            for (String error : listErrors) {
-                bw.write(error);
-                bw.newLine();
-            }
-                bw.flush();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return listErrors.isEmpty() ? "Import thành công" : "Đã xuất ra file lỗi input_account_error.csv";
+        AccountContext accountContext=new AccountContext(setUserName,setEmail,mapByDepartmentId,mapByPostionId);
+        String pathErrorsFile="D:\\FITHOU_23\\VTI Academy\\java_core\\csv\\input_account_error.csv";
+        return this.importCSV(url,accountContext,pathErrorsFile);
     }
 
-    private String validationAccount(String line, List<Account> accounts) {
+
+
+    @Override
+    public void validation(String line, List<Account> entities, List<String> listErrors, AccountContext context) {
         List<String> genders= Arrays.asList("nam","nữ","chưa xác định");
         String[] values=line.split(",");
-        List<String> errors=new ArrayList<>();
+        List<String> errors=new ArrayList<>();// list lỗi của dòg này
 
         String email=values[0];
         if(email.length()<6 || email.length()>100) {
@@ -132,7 +104,7 @@ public class AccountServiceImpl implements IAccountService {
             errors.add("Email sai định dạng");
         }
         else {
-            if(this.checkTonTaiEmail(email)) {
+            if(context.getSetEmail().contains(email)) {
                 errors.add("Email đã tồn tại");
             }
         }
@@ -141,7 +113,7 @@ public class AccountServiceImpl implements IAccountService {
             errors.add("Username có độ dài từ 6 đến 100 kí tự");
         }
         else {
-            if(this.checkTonTaiUserNameThem(userName)) {
+            if(context.getSetUsername().contains(userName))  {
                 errors.add("Username đã tồn tại");
             }
         }
@@ -150,19 +122,25 @@ public class AccountServiceImpl implements IAccountService {
             errors.add("FullName có độ dài từ 6 đến 100 kí tự");
         }
         int departmentId=0;
+        Department department=new  Department();
         if(!values[3].matches(StringCommon.NUMBER_REGEX)) {
             errors.add("departmentId phải là số");
         }
         else {
             departmentId=Integer.parseInt(values[3]);
-        }
-        if(!this.departmentRepository.kiemTraTonTaiDepartmentId(departmentId)) {
-            errors.add("departmentId không tồn tại");
             if (departmentId <= 0 ) {
                 errors.add("departmentId phải là số >0");
             }
         }
+        if(!context.getMapByDepartmentId().containsKey(departmentId)) {
+            errors.add("departmentId không tồn tại");
+        }
+        else {
+            department=context.getMapByDepartmentId().get(departmentId);
+        }
+
         int positionId =0;
+        Postion postion=new Postion();
         if(!values[4].matches(StringCommon.NUMBER_REGEX)) {
             errors.add("postiontId phải là số");
         }
@@ -172,22 +150,50 @@ public class AccountServiceImpl implements IAccountService {
                 errors.add("postiontId phải là số >0");
             }
         }
-        if(!this.positionRepository.kiemTraTonTaiPostionId(positionId)) {
+        if(!context.getMapByPostionId().containsKey(positionId)) {
             errors.add("positionId không tồn tại");
+        }
+        else {
+            postion=context.getMapByPostionId().get(positionId);
         }
         String gender=values[5];
         if(!genders.contains(gender)) {
             errors.add("Gender chỉ có 3 giá trị : nam , nữ, không xác định");
         }
         if (errors.isEmpty()) {
-            Account account=new Account(email,userName,fullName,departmentId,positionId,gender);
-            accounts.add(account);
-            return null;
+            Account account=new Account(email,userName,fullName,department,postion,gender);
+            context.getSetEmail().add(email);
+            context.getSetUsername().add(userName);
+            context.getMapByDepartmentId().put(departmentId,department);
+            context.getMapByPostionId().put(positionId,postion);
+            entities.add(account);
         }
         else {
             String error=String.join(" - ",errors);
             line=line+", "+error;
+            listErrors.add(line);
         }
-        return line;
+    }
+
+    @Override
+    public void saveAll(List<Account> entities) {
+    accountRepository.themListAccount(entities);
+    }
+
+    @Override
+    public void exportErrors(String header, List<String> listErrors, String pathErrorFile) {
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(pathErrorFile));
+            bw.write(header + "error_message");
+            bw.newLine();
+            for (String error : listErrors) {
+                bw.write(error);
+                bw.newLine();
+            }
+            bw.flush();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

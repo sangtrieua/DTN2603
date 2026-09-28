@@ -236,7 +236,8 @@ public class Function {
             System.out.println("3.xóa account theo accountId");
             System.out.println("4.hiển thị ds account");
             System.out.println("5.Import account từ file .csv");
-            System.out.println("6.trở về menu chính");
+            System.out.println("6.Import account từ file .csv");
+            System.out.println("7.trở về menu chính");
             String chonPhu = sc.nextLine();
             switch (chonPhu) {
                 case "1":
@@ -255,6 +256,9 @@ public class Function {
                     this.importCSV();
                     continue;
                 case "6":
+                    this.importCSVDepartment();
+                    continue;
+                case "7":
                     System.exit(0);
                 default:System.err.println("Nhập sai nhập lại"); continue;
             }
@@ -273,6 +277,20 @@ public class Function {
             break;
         }
         String message=accountController.importCSV(url);
+        System.out.println(message);
+    }
+    private void importCSVDepartment() {
+        String url;
+        while (true) {
+            System.out.println("Nhập đường dẫn file csv muốn  import:");//D:\FITHOU_23\VTI Academy\java_core\csv\input_department.csv
+            url=sc.nextLine();
+            if (!url.endsWith(".csv")) {
+                System.out.println( "File không đúng định dạng!!");
+                continue;
+            }
+            break;
+        }
+        String message=departmentController.importDepartmentCSV(url);
         System.out.println(message);
     }
 }

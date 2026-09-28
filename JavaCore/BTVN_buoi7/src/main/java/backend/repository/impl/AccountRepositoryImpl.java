@@ -180,26 +180,26 @@ public class AccountRepositoryImpl implements IAccountRepository {
     }
 
     @Override
-    public boolean themListAccount(List<Account> accounts) {
+    public void themListAccount(List<Account> accounts) {
         String sql="INSERT INTO account\n" +
                 "    (email, username, fullname, department_id, position_id,gender)\n" +
-                "VALUES\n" ;
-        for(Account account:accounts){
-            sql += "('" + account.getEmail() + "'," +
-                    "'" + account.getUserName() + "'," +
-                    "'" + account.getFullName() + "'," +
-                    account.getDepartment().getDepartmentId() + "," +
-                    account.getPostion().getPostionId() + "," +
-                    "'" + account.getGender() + "'),";
-        }
-
-        sql = sql.substring(0, sql.length() - 1);
+                "VALUES\n" +
+                "    (?,   ?,   ?,  ?, ?,?)";
         Connection con=null;
         try {
             con= JDBCUtils.getConnection();
-            Statement st=con.createStatement();
-                        int i=st.executeUpdate(sql);
-            return i > 0;
+            PreparedStatement st=con.prepareStatement(sql);
+            for (Account account : accounts) {
+            st.setString(1, account.getEmail());
+            st.setString(2, account.getUserName());
+            st.setString(3, account.getFullName());
+            st.setInt(4, account.getDepartment().getDepartmentId());
+            st.setInt(5, account.getPostion().getPostionId());
+            st.setString(6, account.getGender());
+            st.addBatch();
+            }
+            st.executeBatch();
+
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
