@@ -89,6 +89,10 @@ public class AccountServiceImpl implements IAccountService, ImportFileCSV<Accoun
         return this.importCSV(url,accountContext,pathErrorsFile);
     }
 
+    @Override
+    public boolean login(String username, String password) {
+        return accountRepository.login(username,password);
+    }
 
 
     @Override

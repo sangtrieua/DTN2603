@@ -207,5 +207,22 @@ public class AccountRepositoryImpl implements IAccountRepository {
         finally {JDBCUtils.close(con);}
     }
 
+    @Override
+    public boolean login(String username, String password) {
+        Connection con=null;
+        String sql="SELECT 1 FROM dtn2603_testing_system.account WHERE username=? && password=?;";
+        try {
+            con= JDBCUtils.getConnection();
+            PreparedStatement st=con.prepareStatement(sql);
+            st.setString(1, username);
+            st.setString(2, password);
+            ResultSet rs=st.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        finally {JDBCUtils.close(con);}
+    }
+
 
 }

@@ -57,4 +57,8 @@ public class AccountController {
     public String importCSV(String url) {
         return service.importCSV(url);
     }
+
+    public boolean login(String username, String password) {
+        return service.login(username,password);
+    }
 }

@@ -24,4 +24,6 @@ public interface IAccountService {
     boolean checkTonTaiUserNameSua(Integer accountId, String userName);
 
     String importCSV(String url);
+
+    boolean login(String username, String password);
 }

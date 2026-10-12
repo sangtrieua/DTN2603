@@ -293,4 +293,25 @@ public class Function {
         String message=departmentController.importDepartmentCSV(url);
         System.out.println(message);
     }
+    public void login(){
+        // nhập username password
+        while (true) {
+    System.out.println("===LOGIN ACCOUNT===");
+        System.out.println("username:");
+        String username=sc.nextLine();
+        System.out.println("password:");
+        String password=sc.nextLine();
+        if(accountController.login(username,password)){
+            System.out.println("Login successful");
+            this.menu();
+            break;
+        }
+        else System.out.println("Login failed");
+        }
+
+        // login đúng
+        // hiển thị menyu
+        // sai thông tin --> thông báo
+        // quay lại login
+    }
 }
