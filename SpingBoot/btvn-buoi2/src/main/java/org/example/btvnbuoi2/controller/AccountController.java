@@ -1,6 +1,8 @@
 package org.example.btvnbuoi2.controller;
 
+import org.example.btvnbuoi2.dto.AccountDTO;
 import org.example.btvnbuoi2.entity.Account;
+import org.example.btvnbuoi2.form.AccountForm;
 import org.example.btvnbuoi2.service.IAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,23 +16,23 @@ public class AccountController {
     private IAccountService accountService;
 
     @GetMapping
-    public List<Account> findAll() {
+    public List<AccountDTO> findAll() {
         return accountService.findAll();
     }
 
     @GetMapping(value = "/{id}")
-    public Account findById(@PathVariable Integer id) {
+    public AccountDTO findById(@PathVariable Integer id) {
     return accountService.findById(id);
     }
 
     @PostMapping
-    public Account create(@RequestBody Account account) {
-        return accountService.create(account);
+    public Account create(@RequestBody AccountForm accountForm) {
+        return accountService.create(accountForm);
     }
 
     @PutMapping(value = "/{id}")
-    public Account update(@PathVariable Integer id, @RequestBody Account account) {
-        return accountService.update(id,account);
+    public Account update(@PathVariable Integer id, @RequestBody AccountForm accountForm) {
+        return accountService.update(id,accountForm);
     }
 
     @DeleteMapping(value = "/{id}")

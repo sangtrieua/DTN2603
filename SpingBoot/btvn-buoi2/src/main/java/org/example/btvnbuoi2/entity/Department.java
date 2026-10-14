@@ -21,9 +21,4 @@ public class Department {
     private String departmentName;
 
 
-    public void hienThiTheoDong(){
-
-        System.out.printf("|%-15s|%-30s|\n",getDepartmentId(),getDepartmentName());
-
-    }
 }

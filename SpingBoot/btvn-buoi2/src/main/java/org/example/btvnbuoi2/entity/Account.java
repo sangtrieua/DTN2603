@@ -42,13 +42,9 @@ public class Account {
     @Temporal(TemporalType.DATE)
     private LocalDate createDate;
 
+    private String password;
 
 
-
-    public void hienThiTheoDong(){
-        System.out.printf("|%-10s|%-35s|%-15s|%-20s|%-10s|%-10s|%-20s|\n",this.accountId,this.email,this.userName,this.fullName,this.department.getDepartmentId(),this.position.getPositionId(),this.createDate);
-
-    }
 
 
 }

@@ -7,4 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IGroupRepository extends JpaRepository<Group, Integer> {
 
+    Group findGroupByName(String name);
+
+    boolean existsGroupByName(String name);
+
+    boolean existsGroupByNameAndIdNot(String name, Integer id);
 }

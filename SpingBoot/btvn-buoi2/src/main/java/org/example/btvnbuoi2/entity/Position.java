@@ -23,8 +23,4 @@ public class Position {
 
 
 
-    public void hienThiTheoDong () {
-        System.out.printf("|%-15s|%-30s|\n", getPositionId(), getPositionName());
-
-    }
 }
