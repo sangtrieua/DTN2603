@@ -7,15 +7,21 @@ import org.example.btvnbuoi2.entity.Department;
 import org.example.btvnbuoi2.entity.GroupAccount;
 import org.example.btvnbuoi2.entity.Position;
 import org.example.btvnbuoi2.enums.PositionName;
+import org.example.btvnbuoi2.exception.BusinessException;
 import org.example.btvnbuoi2.form.AccountForm;
+import org.example.btvnbuoi2.form.AccountSearchForm;
 import org.example.btvnbuoi2.repository.IAccountRepository;
 import org.example.btvnbuoi2.repository.IDepartmentRepository;
 import org.example.btvnbuoi2.repository.IGroupAccountRepository;
 import org.example.btvnbuoi2.repository.IPositionRepository;
 import org.example.btvnbuoi2.service.IAccountService;
 import org.example.btvnbuoi2.service.IGroupAccountService;
+import org.example.btvnbuoi2.specification.AccountCustomSepcification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,14 +40,30 @@ public class AccountServiceImpl implements IAccountService {
     @Autowired
     private ModelMapper modelMapper;
     @Override
-    public List<AccountDTO> findAll() {
-        List<Account> accounts=  accountRepository.findAll();
-        List<AccountDTO> dtos=new ArrayList<>();
-        for(Account account:accounts){
-            AccountDTO dto= modelMapper.map(account,AccountDTO.class);
-            dtos.add(dto);
+    public Page<AccountDTO> findAll(AccountSearchForm searchForm, Pageable pageable) {
+        Specification<Account> where = Specification.unrestricted();
+        if (searchForm.getUserName() != null) {
+            AccountCustomSepcification userNameSearchForm = new AccountCustomSepcification("userName",searchForm.getUserName());
+            where=where.and(userNameSearchForm);
         }
-        return dtos;
+        if (searchForm.getEmail() != null) {
+            AccountCustomSepcification emailSearchForm = new AccountCustomSepcification("email",searchForm.getEmail());
+            where=where.and(emailSearchForm);
+        }
+        if (searchForm.getDepName() != null) {
+            AccountCustomSepcification depNameSearchForm = new AccountCustomSepcification("depName",searchForm.getDepName());
+            where=where.and(depNameSearchForm);
+        }
+        if (searchForm.getPosName() != null) {
+            AccountCustomSepcification posNameSearchForm = new AccountCustomSepcification("posName",searchForm.getPosName());
+            where=where.and(posNameSearchForm);
+        }
+
+
+
+        Page<Account> accounts=  accountRepository.findAll(where,pageable);
+
+        return accounts.map(account->modelMapper.map(account,AccountDTO.class));
     }
 
     @Override
@@ -51,21 +73,21 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public Account create(AccountForm accountForm) {
-        accountForm.checkNull();
+
 
         if (accountRepository.existsAccountByUserName(accountForm.getUserName())){
-            throw new RuntimeException("đã tồn tại username"+accountForm.getUserName());
+            throw new BusinessException("đã tồn tại username"+accountForm.getUserName(),500);
         }
         if (accountRepository.existsAccountByEmail(accountForm.getEmail())){
-            throw new RuntimeException("đã tồn tại Email"+accountForm.getEmail());
+            throw new BusinessException("đã tồn tại Email"+accountForm.getEmail(),500);
         }
         Department dep=departmentRepository.findDepartmentByDepartmentName(accountForm.getDepartmentName());
         if (Objects.isNull(dep)){
-            throw new RuntimeException("không tồn tại tồn tại department"+accountForm.getDepartmentName());
+            throw new BusinessException("không tồn tại tồn tại department"+accountForm.getDepartmentName(),500);
         }
         Position pos=positionRepository.findById(accountForm.getPositionId()).orElse(null);
         if (Objects.isNull(pos)){
-            throw new RuntimeException("không tồn tại tồn tại position"+accountForm.getPositionId());
+            throw new BusinessException("không tồn tại tồn tại position"+accountForm.getPositionId(),500);
         }
         Account account=new  Account();
         account.setUserName(accountForm.getUserName());
@@ -83,24 +105,24 @@ public class AccountServiceImpl implements IAccountService {
     public Account update(Integer id, AccountForm accountFormUpdate) {
         Account account = accountRepository.findById(id).orElse(null);
         if(account==null){
-            throw new RuntimeException("không tồn tại account id "+id);
+            throw new BusinessException("không tồn tại account id "+id,500);
         }
         else {
-            accountFormUpdate.checkNull();
+
 
             if (accountRepository.existsAccountByUserNameAndAccountIdNot(accountFormUpdate.getUserName(),id)){
-                throw new RuntimeException("đã tồn tại username"+accountFormUpdate.getUserName());
+                throw new BusinessException("đã tồn tại username"+accountFormUpdate.getUserName(),500);
             }
             if (accountRepository.existsAccountByEmailAndAccountIdNot(accountFormUpdate.getEmail(),id)){
-                throw new RuntimeException("đã tồn tại Email"+accountFormUpdate.getEmail());
+                throw new BusinessException("đã tồn tại Email"+accountFormUpdate.getEmail(),500);
             }
             Department dep=departmentRepository.findDepartmentByDepartmentName(accountFormUpdate.getDepartmentName());
             if (Objects.isNull(dep)){
-                throw new RuntimeException("không tồn tại tồn tại department"+accountFormUpdate.getDepartmentName());
+                throw new BusinessException("không tồn tại tồn tại department"+accountFormUpdate.getDepartmentName(),500);
             }
             Position pos=positionRepository.findById(accountFormUpdate.getPositionId()).orElse(null);
             if (Objects.isNull(pos)){
-                throw new RuntimeException("không tồn tại tồn tại position"+accountFormUpdate.getPositionId());
+                throw new BusinessException("không tồn tại tồn tại position"+accountFormUpdate.getPositionId(),500);
             }
             account.setUserName(accountFormUpdate.getUserName());
             account.setFullName(accountFormUpdate.getFullName());
@@ -116,7 +138,7 @@ public class AccountServiceImpl implements IAccountService {
     public void deleteById(Integer id) {
         Account account1 = accountRepository.findById(id).orElse(null);
         if(account1==null){
-            throw new RuntimeException("không tồn tại account id "+id);
+            throw new BusinessException("không tồn tại account id "+id,500);
         }
         else {
             accountRepository.deleteById(id);

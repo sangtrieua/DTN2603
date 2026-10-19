@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.btvnbuoi2.dto.GroupDTO;
 import org.example.btvnbuoi2.entity.Account;
 import org.example.btvnbuoi2.entity.Group;
+import org.example.btvnbuoi2.exception.BusinessException;
 import org.example.btvnbuoi2.form.GroupFrom;
 import org.example.btvnbuoi2.repository.IAccountRepository;
 import org.example.btvnbuoi2.repository.IGroupAccountRepository;
@@ -49,13 +50,13 @@ public class GroupServiceImpl implements IGroupService {
 
     @Override
     public Group create(GroupFrom groupFrom) {
-        groupFrom.checkNull();
+
         if(groupRepository.existsGroupByName(groupFrom.getName())){
-            throw new RuntimeException("đã tồn tại tồn tại Group"+groupFrom.getName());
+            throw new BusinessException("đã tồn tại tồn tại Group"+groupFrom.getName(),500);
         }
         Account account=accountRepository.findAccountByUserName(groupFrom.getAccountCreatorUserName());
         if(Objects.isNull(account)){
-            throw new RuntimeException("không tồn tại tồn tại account"+groupFrom.getAccountCreatorUserName());
+            throw new BusinessException("không tồn tại tồn tại account"+groupFrom.getAccountCreatorUserName(),500);
         }
         Group groupNew=new Group();
         groupNew.setName(groupFrom.getName());
@@ -68,16 +69,15 @@ public class GroupServiceImpl implements IGroupService {
     public Group update(Integer id, GroupFrom groupFromUpdate) {
         Group group1 = groupRepository.findById(id).orElse(null);
         if(group1==null){
-            throw new RuntimeException("không tồn tại group id "+id);
+            throw new BusinessException("không tồn tại group id "+id,500);
         }
         else {
-            groupFromUpdate.checkNull();
             if(groupRepository.existsGroupByNameAndIdNot(groupFromUpdate.getName(),id)){
-                throw new RuntimeException("đã tồn tại tồn tại Group"+groupFromUpdate.getName());
+                throw new BusinessException("đã tồn tại tồn tại Group"+groupFromUpdate.getName(),500);
             }
             Account account=accountRepository.findAccountByUserName(groupFromUpdate.getAccountCreatorUserName());
             if(Objects.isNull(account)){
-                throw new RuntimeException("không tồn tại tồn tại account"+groupFromUpdate.getAccountCreatorUserName());
+                throw new BusinessException("không tồn tại tồn tại account"+groupFromUpdate.getAccountCreatorUserName(),500);
             }
             group1.setName(groupFromUpdate.getName());
             group1.setAccountCreator(account);
@@ -90,7 +90,7 @@ public class GroupServiceImpl implements IGroupService {
     public void deleteById(Integer id) {
         Group group1 = groupRepository.findById(id).orElse(null);
         if(group1==null){
-            throw new RuntimeException("không tồn tại group id "+id);
+            throw new BusinessException("không tồn tại group id "+id,500);
         }
         else {
             groupAccountRepository.deleteGroupAccountByGroup(group1);

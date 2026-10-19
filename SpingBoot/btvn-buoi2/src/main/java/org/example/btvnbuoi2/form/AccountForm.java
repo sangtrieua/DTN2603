@@ -1,9 +1,12 @@
 package org.example.btvnbuoi2.form;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.btvnbuoi2.enums.PositionName;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 import java.util.Locale;
@@ -12,31 +15,27 @@ import java.util.Locale;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountForm {
+    @NotBlank
+    @Length(min=6, max=100,message = "userName phải có từ 6 đến 100 kí tự")
     private String userName;
+
+
+    @NotBlank
+    @Length(min=6, max=100,message = "email phải có từ 6 đến 100 kí tự")
+    @Email(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "Email ko đúng định dạng")
     private String email;
+
+    @NotBlank
+    @Length(min=6, max=100,message = "fullName phải có từ 6 đến 100 kí tự")
     private String fullName;
+
+    @NotBlank
+    @Length(min=6, max=100,message = "departmentName phải có từ 6 đến 100 kí tự")
     private String departmentName;
     private Integer positionId;
+
+
     private String password;
-    public void checkNull(){
-        if (this.userName == null || userName.isBlank()){
-            throw new RuntimeException("Không để trống username");
-        }
-        if (this.email == null || email.isBlank()){
-            throw new RuntimeException("Không để trống email");
-        }
-        if (this.fullName == null || fullName.isBlank()){
-            throw new RuntimeException("Không để trống fullName");
-        }
-        if (this.departmentName == null  || departmentName.isBlank()){
-            throw new RuntimeException("Không để trống departmentName");
-        }
-        if (this.positionId == null  ){
-            throw new RuntimeException("Không để trống positionId");
-        }
-        if (this.password == null || this.password.isBlank()){
-            throw new RuntimeException("Không để trống password");
-        }
-    }
+
 
 }

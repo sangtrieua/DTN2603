@@ -6,6 +6,7 @@ import org.example.btvnbuoi2.embeddable.GroupAccountId;
 import org.example.btvnbuoi2.entity.Account;
 import org.example.btvnbuoi2.entity.Group;
 import org.example.btvnbuoi2.entity.GroupAccount;
+import org.example.btvnbuoi2.exception.BusinessException;
 import org.example.btvnbuoi2.form.GroupAccountForm;
 import org.example.btvnbuoi2.repository.IAccountRepository;
 import org.example.btvnbuoi2.repository.IGroupAccountRepository;
@@ -45,18 +46,18 @@ public class GroupAccountServiceImpl implements IGroupAccountService {
 
     @Override
     public GroupAccount addAccountToGroup(GroupAccountForm groupAccountForm) {
-        groupAccountForm.checkNull();
+
         Group group = groupRepository.findGroupByName(groupAccountForm.getGroupName());
         if(Objects.isNull(group)){
-            throw new RuntimeException("Không tồn tại group "+groupAccountForm.getGroupName());
+            throw new BusinessException("Không tồn tại group "+groupAccountForm.getGroupName(),500);
         }
         Account account1=accountRepository.findAccountByUserName(groupAccountForm.getAccountUserName());
         if(Objects.isNull(account1)){
-            throw new RuntimeException("Không tồn tại account "+groupAccountForm.getAccountUserName());
+            throw new BusinessException("Không tồn tại account "+groupAccountForm.getAccountUserName(),500);
         }
         GroupAccountId gid=new GroupAccountId(group.getId(),account1.getAccountId());
         if (groupAccountRepository.existsById(gid)){
-            throw new RuntimeException("đã có account "+groupAccountForm.getAccountUserName()+" trong group "+ group.getName());
+            throw new BusinessException("đã có account "+groupAccountForm.getAccountUserName()+" trong group "+ group.getName(),500);
         }
         GroupAccount groupAccount = new GroupAccount();
         groupAccount.setGroup(group);
@@ -70,7 +71,7 @@ public class GroupAccountServiceImpl implements IGroupAccountService {
     @Override
     public List<GroupAccountDTO> findAllByAccountId(Integer accountId) {
         Account account=accountRepository.findById(accountId)
-                .orElseThrow(()->new EntityNotFoundException("Account not found"));
+                .orElseThrow(()->new RuntimeException("Account not found"));
         List<GroupAccount> groupAccounts=groupAccountRepository.findAllByAccount(account);
         List<GroupAccountDTO> dtos=new ArrayList<>();
         for(GroupAccount groupAccount:groupAccounts){
@@ -83,7 +84,7 @@ public class GroupAccountServiceImpl implements IGroupAccountService {
     @Override
     public List<GroupAccountDTO> findAllByGroupId(Integer groupId) {
         Group group=groupRepository.findById(groupId)
-                .orElseThrow(()->new EntityNotFoundException("Group not found"));
+                .orElseThrow(()->new RuntimeException("Group not found"));
         List<GroupAccount> groupAccounts=groupAccountRepository.findAllByGroup(group);
         List<GroupAccountDTO> dtos=new ArrayList<>();
         for(GroupAccount groupAccount:groupAccounts){

@@ -1,22 +1,21 @@
 package org.example.btvnbuoi2.form;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupFrom {
+    @NotBlank
+    @Length(min=6, max=100,message = "name phải có từ 6 đến 100 kí tự")
     private String name;
-    private String accountCreatorUserName;
-    public void checkNull(){
-        if (this.name == null  || name.isBlank()){
-            throw new RuntimeException("Không để trống groupName");
-        }
-        if (this.accountCreatorUserName == null || accountCreatorUserName.isBlank()){
-            throw new RuntimeException("Không để trống accountCreatorUserName");
-        }
 
-    }
+    @NotBlank
+    @Length(min=6, max=100,message = "accountCreatorUserName phải có từ 6 đến 100 kí tự")
+    private String accountCreatorUserName;
+
 }
